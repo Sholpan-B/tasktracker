@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "tasktracker"
+version = "0.1.0"
+description = ""
+authors = ["Sholpan Bakhtybekkyzy <pasadena2929@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.104.1"
+uvicorn = "^0.23.2"
+poetry = "^1.6.1"
+tortoise-orm = {extras = ["asyncpg"], version = "^0.20.0"}
+aerich = "^0.7.2"
+
+
+
+[tool.poetry.group.extras.dependencies]
+psycopg2-binary = "^2.9.9"
+
+
+[tool.aerich]
+tortoise_orm = "src.app.db.conf.TORTOISE_ORM"
+location = "src/migrations"
+src_folder = "./."
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
