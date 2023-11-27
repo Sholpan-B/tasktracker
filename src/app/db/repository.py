@@ -47,4 +47,28 @@ class BaseRepo:
 class TaskRepository(BaseRepo):
     model = models.Task
 
+    async def get_task_comments(self, task_id: UUID) -> list[models.Comment]:
+        task = await self.get(id=task_id)
+        return await task.comments
 
+    async def add_comment_to_task(self, task_id: UUID, text: str, author_id: UUID) -> models.Comment:
+        task = await self.get(id=task_id)
+        author = await models.User.get(id=author_id)
+        comment = await models.Comment.create(task=task, text=text, author=author)
+        return comment
+
+    async def delete_comment(self, comment_id: UUID) -> None:
+        try:
+            comment = await models.Comment.get(id=comment_id)
+            await comment.delete()
+        except tortoise.exceptions.DoesNotExist as e:
+            raise common_exc.NotFoundException(str(e))
+
+    async def assign_category(self, task_id: UUID, category: str) -> models.Task:
+        try:
+            task = await self.get(id=task_id)
+            task.category = category
+            await task.save()
+            return task
+        except tortoise.exceptions.DoesNotExist as e:
+            raise common_exc.NotFoundException(str(e))

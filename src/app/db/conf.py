@@ -1,11 +1,11 @@
 try:
-    from core.settings import database_url
+    from settings import database_url
     import db.models
 
     models = ['aerich.models', 'db.models']
 
 except ImportError:
-    from src.app.core.settings import database_url
+    from src.app.settings import database_url
 
     models = ['aerich.models', 'src.app.db.models']
 

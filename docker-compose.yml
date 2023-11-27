@@ -4,8 +4,8 @@ services:
   app:
     build:
       context: .
-    environment:
-      - database_url=postgres://postgres:postgres@postgres:5432/postgres
+    env_file:
+      - .env
     ports:
       - "1026:1026"
     volumes:
@@ -18,3 +18,16 @@ services:
     image: postgres:14-alpine
     environment:
       - POSTGRES_PASSWORD=postgres
+
+  minio:
+    image: minio/minio
+    ports:
+      - "9000:9000"
+      - "9090:9090"
+    env_file:
+      - .env
+    command: server --console-address ":9090" /data
+    volumes:
+      - ./minio/data:/data
+      - ./minio/conf:/root/.minio
+

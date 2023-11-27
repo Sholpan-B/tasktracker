@@ -1,3 +1,4 @@
+from typing import List
 from uuid import UUID
 from starlette import status
 import fastapi
@@ -7,6 +8,8 @@ import exceptions.common as common_exc
 import exceptions.http as http_exc
 
 from db.repository import TaskRepository
+
+from db import models
 
 # 'api/task':
 router = fastapi.APIRouter(prefix='/task', tags=['task'])
@@ -62,3 +65,33 @@ async def delete_task(id: UUID):
 
     except common_exc.NotFoundException as e:
         raise http_exc.HTTPNotFoundException(detail=str(e))
+
+
+# Comments:
+@router.post('/task/{task_id}/comment')
+async def add_comment_to_task(task_id: UUID, text: str, author_id: UUID):
+    try:
+        return await repo.add_comment_to_task(task_id, text, author_id)
+    except common_exc.NotFoundException as e:
+        raise http_exc.HTTPNotFoundException(detail=str(e))
+
+
+@router.get('/task/{task_id}/comments')
+async def get_task_comments(task_id: UUID):
+    return await repo.get_task_comments(task_id)
+
+
+@router.delete('/comment/{comment_id}')
+async def delete_comment(comment_id: UUID):
+    try:
+        await repo.delete_comment(comment_id)
+        return fastapi.responses.Response(status_code=status.HTTP_204_NO_CONTENT)
+    except common_exc.NotFoundException as e:
+        raise http_exc.HTTPNotFoundException(detail=str(e))
+
+
+# Categories:
+@router.get('/categories', response_model=List[str])
+async def get_categories():
+    categories = await models.Task.values_list('category', flat=True).distinct()
+    return categories
