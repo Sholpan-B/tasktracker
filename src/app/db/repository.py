@@ -2,8 +2,8 @@ from uuid import UUID
 import tortoise
 import tortoise.exceptions
 
-import src.app.exceptions.common as common_exc
-import models
+from exceptions import common as common_exc
+from db import models
 
 
 class BaseRepo:
@@ -19,6 +19,7 @@ class BaseRepo:
             raise common_exc.NotFoundException(str(e))
 
     async def create(self, **kwargs) -> tortoise.Model:
+        kwargs.setdefault('status', 'new')
         try:
             return await self.model.create(**kwargs)
         except tortoise.exceptions.IntegrityError as e:
@@ -37,7 +38,7 @@ class BaseRepo:
     async def delete(self, id: UUID) -> None:
         try:
             instance = await self.get(id=id)
-            await instance.delete
+            await instance.delete()
 
         except tortoise.exceptions.IntegrityError as e:
             raise common_exc.DeleteException(str(e))

@@ -8,7 +8,14 @@ class TaskSchema(pydantic.BaseModel):
     description: str
 
 
-class TaskGetSchema(TaskSchema):
-    id: UUID | None
-    name: str | None
-    description = str | None
+class TaskGetSchema(pydantic.BaseModel):
+    id: UUID | None = pydantic.Field(None)
+    name: str | None = pydantic.Field(None)
+    description: str | None = pydantic.Field(None, allow_none=True)
+    status: str | None = pydantic.Field(None, allow_none=True)
+
+
+class TaskUpdateSchema(pydantic.BaseModel):
+    name: str | None = pydantic.Field(None)
+    description: str | None = pydantic.Field(None, allow_none=True)
+    status: str | None = pydantic.Field(None, allow_none=True)

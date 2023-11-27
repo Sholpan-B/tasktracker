@@ -1,22 +1,22 @@
 from uuid import UUID
-
+from starlette import status
 import fastapi
-from fastapi import APIRouter
+from api import schemas
 
-import src.app.exceptions.common as common_exc
-import src.app.exceptions.http as http_exc
-from src.app.api.schemas import TaskSchema, TaskGetSchema
-from src.app.db.repository import TaskRepository
+import exceptions.common as common_exc
+import exceptions.http as http_exc
+
+from db.repository import TaskRepository
 
 # 'api/task':
-router = APIRouter(prefix='/task')
+router = fastapi.APIRouter(prefix='/task', tags=['task'])
 repo = TaskRepository()
 
 
 # Контроллер:
 @router.get('')
-async def get_tasks(query: TaskGetSchema = fastapi.Depends()):
-    return await repo.get_list(**query.model_dump())
+async def get_tasks(query: schemas.TaskGetSchema = fastapi.Depends()):
+    return await repo.get_list(**query.model_dump(exclude_none=True))
 
 
 @router.get('/{id}')
@@ -28,9 +28,9 @@ async def get_task(id: UUID):
 
 
 @router.post('')
-async def create_task(body: TaskSchema):
+async def create_task(body: schemas.TaskSchema):
     try:
-        return await repo.create(**body.model_dump())
+        return await repo.create(**body.model_dump(exclude_none=True))
 
     except common_exc.CreateException as e:
         raise http_exc.HTTPBadRequestException(detail=str(e))
@@ -40,9 +40,9 @@ async def create_task(body: TaskSchema):
 
 
 @router.patch('/{id}')
-async def update_task(id: UUID, body: TaskSchema):
+async def update_task(id: UUID, body: schemas.TaskUpdateSchema):
     try:
-        return await repo.update(id, **body.model_dump())
+        return await repo.update(id, **body.model_dump(exclude_none=True))
 
     except common_exc.UpdateException as e:
         raise http_exc.HTTPBadRequestException(detail=str(e))
@@ -52,9 +52,10 @@ async def update_task(id: UUID, body: TaskSchema):
 
 
 @router.delete('/{id}')
-async def delete_task(id: UUID, body: TaskSchema):
+async def delete_task(id: UUID):
     try:
-        return await repo.delete(id)
+        await repo.delete(id)
+        return fastapi.responses.Response(status_code=status.HTTP_204_NO_CONTENT)
 
     except common_exc.DeleteException as e:
         raise http_exc.HTTPBadRequestException(detail=str(e))
