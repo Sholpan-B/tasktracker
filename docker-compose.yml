@@ -31,3 +31,7 @@ services:
       - ./minio/data:/data
       - ./minio/conf:/root/.minio
 
+networks:
+  default:
+    external: true
+    name: 'fa_2'

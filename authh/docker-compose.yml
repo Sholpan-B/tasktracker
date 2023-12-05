@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "1027:8000"
+    volumes:
+      - .:/app
+    command: bash -c "python3 main.py"
+
+
+networks:
+  default:
+    external: true
+    name: 'fa_2'
