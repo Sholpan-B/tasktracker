@@ -13,6 +13,11 @@ services:
       - .:/app
     command: bash -c "python3 main.py"
 
+  postgres:
+    image: postgres:14-alpine
+    environment:
+      - POSTGRES_PASSWORD=postgres
+
 
 networks:
   default:
