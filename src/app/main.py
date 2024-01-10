@@ -1,6 +1,7 @@
 from datetime import datetime
 import fastapi
 import pydantic
+from fastapi.staticfiles import StaticFiles
 
 from tortoise.contrib.fastapi import register_tortoise
 
@@ -20,6 +21,8 @@ def setup():
     app.exception_handler(pydantic.ValidationError)(exc_handlers.query_params_exc_handler)
     app.exception_handler(http_exc.BaseHTTPException)(exc_handlers.request_exc_handler)
     app.exception_handler(500)(exc_handlers.internal_exc_handler)
+
+    app.mount('/media', StaticFiles(directory='media'), name='media')
 
     return app
 

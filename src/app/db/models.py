@@ -1,4 +1,5 @@
 from tortoise import models, fields
+import custom_fields
 
 
 class IdMixin(models.Model):
@@ -36,18 +37,19 @@ class Task(models.Model):
     status = fields.CharField(max_length=20, choices=["in process", "done", "new"])
     author = fields.ForeignKeyField('models.User', related_name='tasks')
     category = fields.CharField(max_length=50)
+    avatar = custom_fields.FileField(upload_to='media/avatars', null=True)
 
     class Meta:
         table = 'task'
 
 
-class User(models.Model):
-    id = fields.UUIDField(pk=True)
-    username = fields.CharField(unique=True, max_length=100)
-    password = fields.CharField(max_length=255)
-
-    class Meta:
-        table = 'user'
+# class User(models.Model):
+#     id = fields.UUIDField(pk=True)
+#     username = fields.CharField(unique=True, max_length=100)
+#     password = fields.CharField(max_length=255)
+#
+#     class Meta:
+#         table = 'user'
 
 
 class Comment(BaseModel):

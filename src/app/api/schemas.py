@@ -1,8 +1,10 @@
 from uuid import UUID
 
 import pydantic
+import decorators
 
 
+@decorators.as_form
 class TaskSchema(pydantic.BaseModel):
     name: str
     description: str

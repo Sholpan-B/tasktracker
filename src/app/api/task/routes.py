@@ -1,7 +1,7 @@
 from typing import List
 from uuid import UUID
 from starlette import status
-import fastapi
+import fastapi as fa
 from api import schemas
 
 import exceptions.common as common_exc
@@ -12,14 +12,14 @@ from db.repository import TaskRepository
 from db import models
 
 # 'api/task':
-router = fastapi.APIRouter(prefix='/task', tags=['task'])
+router = fa.APIRouter(prefix='/task', tags=['task'])
 repo = TaskRepository()
 
 
 # Контроллер:
 @router.get('')
-async def get_tasks(query: schemas.TaskGetSchema = fastapi.Depends()):
-    return await repo.get_list(**query.model_dump(exclude_none=True))
+async def get_tasks(query: schemas.TaskGetSchema = fa.Depends()):
+    return await repo.get_list(**query.dict(exclude_none=True))
 
 
 @router.get('/{id}')
@@ -31,9 +31,12 @@ async def get_task(id: UUID):
 
 
 @router.post('')
-async def create_task(body: schemas.TaskSchema):
+async def create_task(
+    body: schemas.TaskSchema = fa.Depends(schemas.TaskSchema.as_form),
+    avatar: fa.UploadFile = fa.File(...),
+):
     try:
-        return await repo.create(**body.model_dump(exclude_none=True))
+        return await repo.create(**body.dict(), avatar=avatar)
 
     except common_exc.CreateException as e:
         raise http_exc.HTTPBadRequestException(detail=str(e))
@@ -45,7 +48,7 @@ async def create_task(body: schemas.TaskSchema):
 @router.patch('/{id}')
 async def update_task(id: UUID, body: schemas.TaskUpdateSchema):
     try:
-        return await repo.update(id, **body.model_dump(exclude_none=True))
+        return await repo.update(id, **body.dict(exclude_none=True))
 
     except common_exc.UpdateException as e:
         raise http_exc.HTTPBadRequestException(detail=str(e))
@@ -58,7 +61,7 @@ async def update_task(id: UUID, body: schemas.TaskUpdateSchema):
 async def delete_task(id: UUID):
     try:
         await repo.delete(id)
-        return fastapi.responses.Response(status_code=status.HTTP_204_NO_CONTENT)
+        return fa.responses.Response(status_code=status.HTTP_204_NO_CONTENT)
 
     except common_exc.DeleteException as e:
         raise http_exc.HTTPBadRequestException(detail=str(e))
@@ -85,7 +88,7 @@ async def get_task_comments(task_id: UUID):
 async def delete_comment(comment_id: UUID):
     try:
         await repo.delete_comment(comment_id)
-        return fastapi.responses.Response(status_code=status.HTTP_204_NO_CONTENT)
+        return fa.responses.Response(status_code=status.HTTP_204_NO_CONTENT)
     except common_exc.NotFoundException as e:
         raise http_exc.HTTPNotFoundException(detail=str(e))
 

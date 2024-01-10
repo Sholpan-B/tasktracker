@@ -1,13 +1,14 @@
-try:
-    from settings import database_url
-    import db.models
+# try:
 
-    models = ['aerich.models', 'db.models']
+from settings import database_url
+import db.models
 
-except ImportError:
-    from src.app.settings import database_url
+models = ['aerich.models', 'db.models']
 
-    models = ['aerich.models', 'src.app.db.models']
+# except ImportError:
+#     from src.app.settings import database_url
+#
+#     models = ['aerich.models', 'src.app.db.models']
 
 TORTOISE_ORM = {
     'connections': {'default': database_url},
