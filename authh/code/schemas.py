@@ -1,3 +1,6 @@
+from dataclasses import dataclass
+from datetime import datetime
+
 from pydantic import BaseModel
 
 
@@ -9,7 +12,22 @@ class CreateUserSchema(BaseModel):
    password: str
 
 
-class UserInDB(CreateUserSchema):
-   id: int
-   date_registered: str
+class UserAllOptionalSchema(BaseModel):
+   username: None | str
+   password: None | str
+
+
+@dataclass
+class LoginRequestModel:
+   username: str
+   password: str
+
+
+@dataclass
+class TokenData:
+   role: str
+   sub: int
+   exp: datetime | None = None
+
+
 

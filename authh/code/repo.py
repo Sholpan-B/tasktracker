@@ -3,7 +3,7 @@ import tortoise
 import tortoise.exceptions
 
 import models
-from src.app.exceptions import common as common_exc
+import common as common_exc
 from passlib.context import CryptContext
 
 
